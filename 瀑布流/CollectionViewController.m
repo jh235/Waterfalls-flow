@@ -10,10 +10,12 @@
 #import "ShopCell.h"
 #import "WaterflowLayout.h"
 #import "ShopsModel.h"
+#import "SDPhotoBrowser.h"
 
-@interface CollectionViewController ()
+@interface CollectionViewController ()<SDPhotoBrowserDelegate>
 @property(nonatomic,strong)NSArray * dateList;
 @property (weak, nonatomic) IBOutlet WaterflowLayout *layout;
+@property(nonatomic,strong)ShopCell *cell;
 
 @end
 
@@ -49,12 +51,50 @@ static NSString * const reuseIdentifier = @"Cell";
     
     ShopCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cell" forIndexPath:indexPath];
     
-    cell.backgroundColor = [UIColor colorWithRed:((float)arc4random_uniform(256) / 255.0) green:((float)arc4random_uniform(256) / 255.0) blue:((float)arc4random_uniform(256) / 255.0) alpha:1.0];
-    
     cell.shop = self.dateList[indexPath.item];
+    
+//    self.cell = cell;
     
     return cell;
 }
+#pragma mark - 图片浏览器
+
+-(void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath{
+    
+//    NSIndexPath *indexpath =
+    
+    self.cell = (ShopCell *)[collectionView cellForItemAtIndexPath:indexPath];
+    
+    
+    SDPhotoBrowser *browser = [[SDPhotoBrowser alloc] init];
+    browser.sourceImagesContainerView = self.collectionView; // 原图的父控件
+//    browser.imageCount = 1; // 图片总数
+    browser.imageCount = self.dateList.count; // 图片总数
+    browser.currentImageIndex = indexPath.item;
+    browser.delegate = self;
+    [browser show];
+
+}
+
+// 返回临时占位图片（即原来的小图）
+- (UIImage *)photoBrowser:(SDPhotoBrowser *)browser placeholderImageForIndex:(NSInteger)index
+{
+    return self.cell.imageView.image;
+}
+
+
+// 返回高质量图片的url
+- (NSURL *)photoBrowser:(SDPhotoBrowser *)browser highQualityImageURLForIndex:(NSInteger)index
+{
+    ShopsModel *shop = self.dateList[index];
+    
+    NSString *urlStr = shop.img;
+    return [NSURL URLWithString:urlStr];
+}
+
+
+
+
 #pragma mark - 懒加载
 - (NSArray *)dateList{
     if (_dateList == nil) {

@@ -11,5 +11,11 @@
 @class ShopsModel;
 @interface ShopCell : UICollectionViewCell
 @property(nonatomic,strong)ShopsModel * shop;
+//
+@property (weak, nonatomic) IBOutlet UIImageView *imageView;
+
+@property (weak, nonatomic) IBOutlet UILabel *priceLabel;
+
+
 
 @end
